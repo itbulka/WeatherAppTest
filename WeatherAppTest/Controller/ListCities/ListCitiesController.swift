@@ -9,15 +9,7 @@ import UIKit
 
 class ListCitiesController: BaseViewController {
     
-        //MARK: Test data
-    
-    private let weather: [WeatherData] = [
-        WeatherData(nameCity: "Moscow", temperature: 22, conditionWeather: "Облачно"),
-        WeatherData(nameCity: "New York", temperature: 16, conditionWeather: "Солнечно"),
-        WeatherData(nameCity: "Niznevartovsk", temperature: -12, conditionWeather: "Снегопад"),
-        WeatherData(nameCity: "Novosibirsk", temperature: 6, conditionWeather: "Дождь"),
-        WeatherData(nameCity: "Sankt-Peterburg", temperature: 10, conditionWeather: "Дождь")
-    ]
+    private let presenter = ListCitiesPresenter()
     
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -34,8 +26,13 @@ class ListCitiesController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = Resources.Titles.listViewTitle      
-        
+        title = Resources.Titles.listViewTitle
+        presenter.viewController = self
+        presenter.getData()
+    }
+    
+    func reloadData() {
+        collectionView.reloadData()
     }
 
 
@@ -64,12 +61,12 @@ extension ListCitiesController: UICollectionViewDelegate, UICollectionViewDataSo
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return weather.count
+        return presenter.weatherData.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let collectionCell = collectionView.dequeueReusableCell(withReuseIdentifier: CityViewCell.identifier, for: indexPath) as? CityViewCell else { return UICollectionViewCell() }
-        collectionCell.configureContent(with: weather[indexPath.row])
+        collectionCell.configureContent(with: presenter.weatherData[indexPath.row])
         return collectionCell
     }
 }

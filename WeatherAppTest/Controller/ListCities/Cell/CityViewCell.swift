@@ -41,7 +41,7 @@ class CityViewCell: UICollectionViewCell {
     private let buttonLike: UIButton = {
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 10, height: 10))
         btn.setImage(Resources.Icons.like, for: .normal)
-        btn.tintColor = .systemRed
+        btn.tintColor = .gray
         return btn
     }()
     
@@ -97,12 +97,12 @@ class CityViewCell: UICollectionViewCell {
     }
     
     func configureContent(with weather: WeatherData) {
-        imageWeather.image = Resources.Icons.Weather.getIconsForWeather(with: weather.temperature)
-        imageWeather.tintColor = Resources.Colors.getColorForWeather(with: weather.temperature)
-        nameCity.text = weather.nameCity
-        weatherCondition.text = weather.conditionWeather
-        temperature.text = "\(weather.temperature)"
-        temperature.textColor = Resources.Colors.getColorForWeather(with: weather.temperature)
+        imageWeather.image = Resources.Icons.Weather.getIconsForWeather(with: weather.main.temp)
+        imageWeather.tintColor = Resources.Colors.getColorForWeather(with: weather.main.temp)
+        nameCity.text = weather.name
+        weatherCondition.text = weather.weather.first?.description ?? "nil"
+        temperature.text = "\(weather.main.temp)"
+        temperature.textColor = Resources.Colors.getColorForWeather(with: weather.main.temp)
     }
     
 }
