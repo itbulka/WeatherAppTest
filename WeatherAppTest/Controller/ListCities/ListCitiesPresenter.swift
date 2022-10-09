@@ -44,4 +44,13 @@ final class ListCitiesPresenter {
             }
         }
     }
+    
+    func checkIsFavorite(with weather: WeatherData) -> Bool {
+        guard let objects = CoreDataService.shared.getObject() else {
+            return false
+        }
+        
+        return objects.contains(where: { $0.name == weather.name })
+    }
+    
 }

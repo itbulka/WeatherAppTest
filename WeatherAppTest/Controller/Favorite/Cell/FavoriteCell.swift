@@ -11,6 +11,10 @@ class FavoriteCell: UITableViewCell {
     
     static let identifier: String = "FavoriteCell"
     
+    var delegate: FavoriteViewController?
+    
+    private var weather: WeatherCD?
+    
     private let viewCell: UIView = {
         let view = UIView()
         view.backgroundColor = .white
@@ -63,11 +67,13 @@ class FavoriteCell: UITableViewCell {
     }
     
     private func configureCell() {
-        addView(viewCell)
+        contentView.addView(viewCell)
         viewCell.addView(temperature)
         viewCell.addView(nameCity)
         viewCell.addView(weatherCondition)
         viewCell.addView(buttonLike)
+        
+        buttonLike.addTarget(self, action: #selector(deleteObjectForCoreData), for: .touchDown)
         
         constraintLayout()
     }
@@ -92,6 +98,23 @@ class FavoriteCell: UITableViewCell {
             buttonLike.centerYAnchor.constraint(equalTo: viewCell.centerYAnchor)
             
         ])
+    }
+    
+    func configureContent(weather: WeatherCD) {
+        self.weather = weather
+        nameCity.text = weather.name
+        temperature.text = "\(weather.temperature)"
+        temperature.textColor = Resources.Colors.getColorForWeather(with: weather.temperature)
+        weatherCondition.text = "\(weather.conditionWeather ?? "-"), \(weather.wingSpeed) м/с"
+    }
+    
+    @objc private func deleteObjectForCoreData() {
+        CoreDataService.shared.deleteObject(objectCD: self.weather)
+        DispatchQueue.main.async { [weak self] in
+            self?.delegate?.updateData()
+            self?.delegate?.reloadTableData()
+        }
+        
     }
     
 }

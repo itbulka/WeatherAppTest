@@ -9,6 +9,8 @@ import UIKit
 
 class FavoriteViewController: BaseViewController {
     
+    private var presenter = FavoritePresenter()
+    
     private let tableFavoriteCities: UITableView = {
         let table = UITableView()
         table.register(FavoriteCell.self, forCellReuseIdentifier: FavoriteCell.identifier)
@@ -20,24 +22,41 @@ class FavoriteViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = Resources.Titles.favoriteTitle
+        presenter.viewController = self
         
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateData()
+        reloadTableData()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        tableFavoriteCities.frame = view.bounds
+        
     }
-
+    
+    func reloadTableData() {
+        tableFavoriteCities.reloadData()
+    }
+    
+    func updateData() {
+        presenter.getWeather()
+    }
+    
 
 }
 
 extension FavoriteViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return presenter.weatherCity.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: FavoriteCell.identifier, for: indexPath) as? FavoriteCell else { return UITableViewCell()}
+        cell.delegate = self
+        cell.configureContent(weather: presenter.weatherCity[indexPath.row])
         return cell
     }
     
@@ -49,6 +68,7 @@ extension FavoriteViewController: UITableViewDelegate, UITableViewDataSource {
         super.configureUI()
         tableFavoriteCities.delegate = self
         tableFavoriteCities.dataSource = self
+        
     }
     
     override func addViews() {
@@ -58,5 +78,6 @@ extension FavoriteViewController: UITableViewDelegate, UITableViewDataSource {
     
     override func layoutConstraints() {
         super.layoutConstraints()
+        tableFavoriteCities.frame = view.bounds
     }
 }

@@ -11,6 +11,9 @@ class CityViewCell: UICollectionViewCell {
     
     static let identifier: String = "CityViewCell"
     
+    private var weather: WeatherData?
+    private var isFavorite: Bool = false
+    
     private var imageWeather: UIImageView = {
         var img = UIImageView()
         img.contentMode = .scaleAspectFill
@@ -64,10 +67,12 @@ class CityViewCell: UICollectionViewCell {
         
         
         addView(imageWeather)
-        addView(buttonLike)
+        contentView.addView(buttonLike)
         addView(temperature)
         addView(nameCity)
         addView(weatherCondition)
+        
+        buttonLike.addTarget(self, action: #selector(tapButtonLike), for: .touchUpInside)
         
         constraintLayout()
     }
@@ -96,13 +101,34 @@ class CityViewCell: UICollectionViewCell {
         ])
     }
     
-    func configureContent(with weather: WeatherData) {
+    func configureContent(with weather: WeatherData, _ isFavorite: Bool) {
+        self.weather = weather
+        self.isFavorite = isFavorite
+        
         imageWeather.image = Resources.Icons.Weather.getIconsForWeather(with: weather.main.temp)
         imageWeather.tintColor = Resources.Colors.getColorForWeather(with: weather.main.temp)
         nameCity.text = weather.name
         weatherCondition.text = weather.weather.first?.description ?? "nil"
         temperature.text = "\(weather.main.temp)"
         temperature.textColor = Resources.Colors.getColorForWeather(with: weather.main.temp)
+        buttonLike.tintColor = isFavorite ? .systemRed : .gray
+        
     }
     
+    @objc private func tapButtonLike() {
+        guard let weather = weather else { return }
+        if isFavorite {
+            isFavorite.toggle()
+            CoreDataService.shared.deleteObject(data: weather)
+            UIView.animate(withDuration: 0.2) {
+                self.buttonLike.tintColor = .gray
+            }
+        } else {
+            isFavorite.toggle()
+            CoreDataService.shared.createObject(data: weather)
+            UIView.animate(withDuration: 0.2) {
+                self.buttonLike.tintColor = .systemRed
+            }
+        }
+    }
 }

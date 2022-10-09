@@ -31,6 +31,11 @@ class ListCitiesController: BaseViewController {
         presenter.getData()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        reloadData()
+    }
+    
     func reloadData() {
         collectionView.reloadData()
     }
@@ -66,7 +71,10 @@ extension ListCitiesController: UICollectionViewDelegate, UICollectionViewDataSo
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let collectionCell = collectionView.dequeueReusableCell(withReuseIdentifier: CityViewCell.identifier, for: indexPath) as? CityViewCell else { return UICollectionViewCell() }
-        collectionCell.configureContent(with: presenter.weatherData[indexPath.row])
+        let weatherData = presenter.weatherData[indexPath.row]
+        let isFavorite = presenter.checkIsFavorite(with: weatherData)
+        collectionCell.configureContent(with: weatherData, isFavorite)
         return collectionCell
     }
+    
 }
